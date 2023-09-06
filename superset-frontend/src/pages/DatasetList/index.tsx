@@ -42,6 +42,7 @@ import { useListViewResource } from 'src/views/CRUD/hooks';
 import ConfirmStatusChange from 'src/components/ConfirmStatusChange';
 import { DatasourceModal } from 'src/components/Datasource';
 import DeleteModal from 'src/components/DeleteModal';
+import ImportSDMXModal from 'src/components/ImportSDMXModal';
 import handleResourceExport from 'src/utils/export';
 import ListView, {
   ListViewProps,
@@ -616,6 +617,18 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
 
   const buttonArr: Array<ButtonProps> = [];
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleImportFileModal = () => {
+    setIsModalOpen(true);
+  };
+
+  buttonArr.push({
+    name: 'Import SDMX url',
+    onClick: toggleImportFileModal,
+    buttonStyle: 'tertiary',
+  });
+
   if (canDelete || canExport) {
     buttonArr.push({
       name: t('Bulk select'),
@@ -684,7 +697,6 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
       ),
     );
   };
-
   const handleBulkDatasetDelete = (datasetsToDelete: Dataset[]) => {
     SupersetClient.delete({
       endpoint: `/api/v1/dataset/?q=${rison.encode(
@@ -727,9 +739,18 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
     );
   };
 
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <>
       <SubMenu {...menuData} />
+      <ImportSDMXModal isOpen={isModalOpen} onClose={closeModal} />
       {datasetCurrentlyDeleting && (
         <DeleteModal
           description={

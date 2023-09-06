@@ -37,10 +37,10 @@ from importlib.resources import files
 from typing import Any, Callable, Literal, TYPE_CHECKING, TypedDict
 
 import pkg_resources
+from cachelib.base import BaseCache
 from celery.schedules import crontab
 from flask import Blueprint
 from flask_appbuilder.security.manager import AUTH_DB
-from flask_caching.backends.base import BaseCache
 from pandas import Series
 from pandas._libs.parsers import STR_NA_VALUES  # pylint: disable=no-name-in-module
 from sqlalchemy.orm.query import Query
@@ -283,11 +283,6 @@ AUTH_RATE_LIMIT = "5 per second"
 # ------------------------------
 # GLOBALS FOR APP Builder
 # ------------------------------
-# Uncomment to setup Your App name
-APP_NAME = "Superset"
-
-# Specify the App icon
-APP_ICON = "/static/assets/images/superset-logo-horiz.png"
 
 # Specify where clicking the logo would take the user
 # e.g. setting it to '/' would take the user to '/superset/welcome/'
@@ -740,7 +735,6 @@ CORS_OPTIONS: dict[Any, Any] = {}
 # Disabling this option is not recommended for security reasons. If you wish to allow
 # valid safe elements that are not included in the default sanitization schema, use the
 # HTML_SANITIZATION_SCHEMA_EXTENSIONS configuration.
-HTML_SANITIZATION = True
 
 # Use this configuration to extend the HTML sanitization schema.
 # By default we use the Gihtub schema defined in
@@ -916,7 +910,7 @@ DASHBOARD_AUTO_REFRESH_INTERVALS = [
 
 # Default celery config is to use SQLA as a broker, in a production setting
 # you'll want to use a proper broker as specified here:
-# https://docs.celeryq.dev/en/stable/getting-started/backends-and-brokers/index.html
+# http://docs.celeryproject.org/en/latest/getting-started/brokers/index.html
 
 
 class CeleryConfig:  # pylint: disable=too-few-public-methods
@@ -1403,11 +1397,8 @@ PREFERRED_DATABASES: list[str] = [
 # one here.
 TEST_DATABASE_CONNECTION_TIMEOUT = timedelta(seconds=30)
 
-# Enable/disable CSP warning
-CONTENT_SECURITY_POLICY_WARNING = True
-
 # Do you want Talisman enabled?
-TALISMAN_ENABLED = utils.cast_to_boolean(os.environ.get("TALISMAN_ENABLED", True))
+TALISMAN_ENABLED = False
 
 # If you want Talisman, how do you want it configured??
 TALISMAN_CONFIG = {
@@ -1471,7 +1462,7 @@ STATIC_ASSETS_PREFIX = ""
 # Typically these should not be allowed.
 PREVENT_UNSAFE_DB_CONNECTIONS = True
 
-# If true all default urls on datasets will be handled as relative URLs by the frontend
+# Prevents unsafe default endpoints to be registered on datasets.
 PREVENT_UNSAFE_DEFAULT_URLS_ON_DATASET = True
 
 # Define a list of allowed URLs for dataset data imports (v1).
@@ -1676,3 +1667,51 @@ elif importlib.util.find_spec("superset_config") and not is_test():
     except Exception:
         logger.exception("Found but failed to import local superset_config")
         raise
+
+PREVENT_UNSAFE_DB_CONNECTIONS = False
+
+from flask_appbuilder.security.views import expose
+from superset.security import SupersetSecurityManager
+from flask_appbuilder.security.manager import BaseSecurityManager
+from flask_appbuilder.security.manager import AUTH_REMOTE_USER
+from flask import  redirect
+from flask_login import login_user
+
+# AuthRemoteUserView=BaseSecurityManager.authremoteuserview
+# class AuthRemoteUserView(AuthRemoteUserView):
+#     @expose('/login/')
+#     def login(self):
+#       user = self.appbuilder.sm.auth_user_db("admin", "admin")
+#       login_user(user, remember=False)
+#       return redirect(self.appbuilder.get_url_for_index)
+
+
+# class CustomSecurityManager(SupersetSecurityManager):
+#     authremoteuserview = AuthRemoteUserView
+
+# CUSTOM_SECURITY_MANAGER = CustomSecurityManager
+
+# AUTH_TYPE = AUTH_REMOTE_USER
+
+# OVERRIDE_HTTP_HEADERS = {'X-Frame-Options': 'ALLOWALL'}
+
+HTML_SANITIZATION = False
+CONTENT_SECURITY_POLICY_WARNING = False
+
+APP_ICON="/static/assets/images/logo.png"
+APP_NAME="SDMX Insight"
+
+THEME_OVERRIDES = {
+  "borderRadius": 4,
+  "colors": {
+    "primary": {
+      "primary": '#3c86ae',
+    },
+    "secondary": {
+      "base": '#3c86ae',
+    },
+    "grayscale": {
+      "base": '#525252',
+    }
+  }
+}
