@@ -25,7 +25,7 @@ from flask_appbuilder.api import expose, protect
 from flask_babel import gettext as _
 from marshmallow import ValidationError
 
-from superset import is_feature_enabled, security_manager
+from superset import is_feature_enabled, security_manager, db
 from superset.async_events.async_query_manager import AsyncQueryTokenException
 from superset.charts.api import ChartRestApi
 from superset.charts.client_processing import apply_client_processing
@@ -54,6 +54,10 @@ from superset.utils.core import (
 from superset.utils.decorators import logs_context
 from superset.views.base import CsvResponse, generate_download_headers, XlsxResponse
 from superset.views.base_api import statsd_metrics
+from sdmxthon import read_sdmx
+from sqlalchemy import create_engine
+import datetime
+import os
 
 if TYPE_CHECKING:
     from superset.common.query_context import QueryContext
@@ -232,6 +236,24 @@ class ChartDataRestApi(ChartRestApi):
                 json_body = json.loads(request.form["form_data"])
         if json_body is None:
             return self.response_400(message=_("Request is not JSON"))
+        if "slice_id" in json_body['form_data']:
+            slice = db.session.query(Slice).filter_by(id=json_body['form_data']['slice_id']).first()
+            datasource_id = slice.datasource_id
+            datasource = db.session.query(SqlaTable).filter_by(id=datasource_id).first()
+            database = db.session.query(Database).filter_by(id=datasource.database_id).first()
+            if datasource and datasource.is_sdmx and json_body['form_data']['force']:
+                message = read_sdmx(datasource.sdmx_url)
+                datasource.sdmx_uuid = database.database_name.split(" ")[0]
+                engine = create_engine(f"sqlite:///dbs/{datasource.sdmx_uuid}", echo=False)
+
+                for dataset in message.payload.keys():
+                    df = message.payload[dataset].data
+                    table_name = str(dataset) + " " + str(datetime.datetime.now())
+                    df.to_sql(table_name, con=engine)
+                    datasource.table_name = table_name
+                
+                db.session.commit()
+
 
         try:
             query_context = self._create_query_context_from_form(json_body)

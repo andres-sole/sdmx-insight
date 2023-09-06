@@ -99,7 +99,8 @@ class DatasetPostSchema(Schema):
     external_url = fields.String(allow_none=True)
     normalize_columns = fields.Boolean(load_default=False)
     always_filter_main_dttm = fields.Boolean(load_default=False)
-
+    is_sdmx = fields.Boolean(allow_none=True)
+    sdmx_url = fields.String(allow_none=True)
 
 class DatasetPutSchema(Schema):
     table_name = fields.String(allow_none=True, validate=Length(1, 250))

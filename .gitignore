@@ -122,3 +122,6 @@ docker/*local*
 # Jest test report
 test-report.html
 superset/static/stats/statistics.html
+
+# SDMX Insight
+dbs/
