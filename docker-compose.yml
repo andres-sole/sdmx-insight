@@ -32,6 +32,7 @@ x-superset-volumes: &superset-volumes
   - ./superset-frontend:/app/superset-frontend
   - superset_home:/app/superset_home
   - ./tests:/app/tests
+  - ./dbs:/app/dbs
 
 x-common-build: &common-build
   context: .

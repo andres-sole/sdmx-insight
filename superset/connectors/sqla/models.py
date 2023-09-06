@@ -1177,6 +1177,9 @@ class SqlaTable(
     database_id = Column(Integer, ForeignKey("dbs.id"), nullable=False)
     fetch_values_predicate = Column(Text)
     owners = relationship(owner_class, secondary=sqlatable_user, backref="tables")
+    is_sdmx = Column(Boolean, default=False)
+    sdmx_url = Column(String(1024), nullable=True)
+    sdmx_uuid = Column(String(256), nullable=True)
     database: Database = relationship(
         "Database",
         backref=backref("tables", cascade="all, delete-orphan"),

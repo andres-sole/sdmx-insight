@@ -68,6 +68,7 @@ import { DashboardStatus } from 'src/features/dashboards/types';
 import { UserWithPermissionsAndRoles } from 'src/types/bootstrapTypes';
 import { findPermission } from 'src/utils/findPermission';
 import { ModifiedInfo } from 'src/components/AuditInfo';
+import ImportDashboardSDMXModal from 'src/components/ImportDashboardSDMXModal';
 
 const PAGE_SIZE = 25;
 const PASSWORDS_NEEDED_MESSAGE = t(
@@ -663,6 +664,18 @@ function DashboardList(props: DashboardListProps) {
   );
 
   const subMenuButtons: SubMenuProps['buttons'] = [];
+
+  const [importYamlModalOpen, handleImportYamlModalOpen] =
+    useState<boolean>(false);
+
+  subMenuButtons.push({
+    name: 'Import SDMX Dashboard YAML',
+    buttonStyle: 'tertiary',
+    onClick: () => {
+      handleImportYamlModalOpen(true);
+    },
+  });
+
   if (canDelete || canExport) {
     subMenuButtons.push({
       name: t('Bulk select'),
@@ -795,7 +808,10 @@ function DashboardList(props: DashboardListProps) {
           );
         }}
       </ConfirmStatusChange>
-
+      <ImportDashboardSDMXModal
+        isOpen={importYamlModalOpen}
+        onClose={() => handleImportYamlModalOpen(false)}
+      />
       <ImportModelsModal
         resourceName="dashboard"
         resourceLabel={t('dashboard')}
