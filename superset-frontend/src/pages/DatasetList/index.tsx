@@ -624,7 +624,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
   };
 
   buttonArr.push({
-    name: 'Import SDMX url',
+    name: 'Import SDMX dataset',
     onClick: toggleImportFileModal,
     buttonStyle: 'tertiary',
   });

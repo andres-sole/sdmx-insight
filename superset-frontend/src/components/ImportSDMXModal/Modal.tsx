@@ -5,29 +5,49 @@ import { SupersetClient } from '@superset-ui/core';
 import { Space } from 'antd';
 import Button from '../Button';
 import { Input } from '../Input';
+import { useToasts } from 'src/components/MessageToasts/withToasts';
+
+
 
 const Modal = ({ isOpen, onClose, children }) => {
+
   if (!isOpen) {
     return null;
   }
-
+  
   const [sdmxUrl, setSdmxUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { addDangerToast } = useToasts();
 
   const onUpload = () => {
+    setIsLoading(true)
+
+    
     SupersetClient.post({
       endpoint: 'api/v1/sdmx/',
       jsonPayload: {
         sdmxUrl,
       },
     }).then(res => {
+      setIsLoading(false);
       window.location.reload();
-    });
+    }).catch(err => {
+      setIsLoading(false);
+      console.log(err)
+
+      addDangerToast("There was an error loading the SDMX Url");
+      setSdmxUrl('');
+    }
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <h3>Import SDMX</h3>
+        <h3>Import SDMX Dataset</h3>
+        <p style={{color: "rgb(75, 75, 75)"}}>
+          SDMX (Statistical Data and Metadata eXchange) is an international standard for exchanging statistical data and metadata. Supported by major international organizations like the IMF, World Bank, and OECD, it is widely used in various domains like agriculture, finance, and social statistics.
+          <a target='_blank' href='https://sdmx.org/' style={{'padding': '0 1em'}}>Learn more </a>
+        </p>
         <div className="file-uploader">
           <Space direction="horizontal">
             <Input
@@ -40,9 +60,12 @@ const Modal = ({ isOpen, onClose, children }) => {
               onClick={onUpload}
               buttonStyle="primary"
               disabled={sdmxUrl.length === 0}
+              loading={isLoading}
             >
-              Load
+              { !isLoading ? "Load" : "Loading..." }
             </Button>
+            <a target='_blank' href='https://sdmxhub.meaningfuldata.eu/' style={{}}>SDMXHub</a>
+
           </Space>
         </div>
         <Button onClick={onClose}>Cancel</Button>
