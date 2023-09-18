@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import './Modal.css'; // Assuming you place your CSS in this file
 import { SupersetClient } from '@superset-ui/core';
 import { Space } from 'antd';
 import Button from '../Button';
 import { Input } from '../Input';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
+import Modal from 'src/components/Modal';
+import { FormLabel } from '../Form';
 
 
 
-const Modal = ({ isOpen, onClose, children }) => {
+const SdmxImportModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) {
     return null;
@@ -41,21 +42,9 @@ const Modal = ({ isOpen, onClose, children }) => {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <h3>Import SDMX Dataset</h3>
-        <p style={{color: "rgb(75, 75, 75)"}}>
-          SDMX (Statistical Data and Metadata eXchange) is an international standard for exchanging statistical data and metadata. Supported by major international organizations like the IMF, World Bank, and OECD, it is widely used in various domains like agriculture, finance, and social statistics.
-          <a target='_blank' href='https://sdmx.org/' style={{'padding': '0 1em'}}>Learn more </a>
-        </p>
-        <div className="file-uploader">
-          <Space direction="horizontal">
-            <Input
-              placeholder="SDMX url"
-              value={sdmxUrl}
-              onChange={evt => setSdmxUrl(evt.target.value)}
-            />
-            {children}
+      <Modal show={isOpen} title="Import SDMX Dataset" onHide={onClose} 
+      footer={
+        <>
             <Button
               onClick={onUpload}
               buttonStyle="primary"
@@ -64,20 +53,29 @@ const Modal = ({ isOpen, onClose, children }) => {
             >
               { !isLoading ? "Load" : "Loading..." }
             </Button>
-            <a target='_blank' href='https://sdmxhub.meaningfuldata.eu/' style={{}}>SDMXHub</a>
-
-          </Space>
-        </div>
-        <Button onClick={onClose}>Cancel</Button>
-      </div>
-    </div>
+        </>
+      }>
+        <p style={{color: "rgb(75, 75, 75)"}}>
+          SDMX (Statistical Data and Metadata eXchange) is an international standard for exchanging statistical data and metadata. Supported by major international organizations like the IMF, World Bank, and OECD, it is widely used in various domains like agriculture, finance, and social statistics.
+          <a target='_blank' href='https://sdmx.org/' style={{'padding': '0 1em'}}>Learn more </a>
+        </p>
+        <Space direction="vertical" size={12}>
+        <FormLabel>SDMX Url</FormLabel>
+            <Input
+              placeholder="Insert SDMX url..."
+              value={sdmxUrl}
+              onChange={evt => setSdmxUrl(evt.target.value)}
+            />
+          <a target='_blank' href='https://sdmxhub.meaningfuldata.eu/' style={{}}>SDMXHub</a>
+        </Space>
+      </Modal>
   );
 };
 
-Modal.propTypes = {
+SdmxImportModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func,
   children: PropTypes.node,
 };
 
-export default Modal;
+export default SdmxImportModal;
