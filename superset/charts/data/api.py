@@ -53,10 +53,7 @@ from superset.utils.async_query_manager import AsyncQueryTokenException
 from superset.utils.core import create_zip, get_user_id, json_int_dttm_ser
 from superset.views.base import CsvResponse, generate_download_headers, XlsxResponse
 from superset.views.base_api import statsd_metrics
-from sdmxthon import read_sdmx
-from sqlalchemy import create_engine
-import datetime
-import os
+from superset.sdmx import load_database
 
 if TYPE_CHECKING:
     from superset.common.query_context import QueryContext
@@ -239,19 +236,8 @@ class ChartDataRestApi(ChartRestApi):
             slice = db.session.query(Slice).filter_by(id=json_body['form_data']['slice_id']).first()
             datasource_id = slice.datasource_id
             datasource = db.session.query(SqlaTable).filter_by(id=datasource_id).first()
-            database = db.session.query(Database).filter_by(id=datasource.database_id).first()
             if datasource and datasource.is_sdmx and json_body['form_data']['force']:
-                message = read_sdmx(datasource.sdmx_url)
-                datasource.sdmx_uuid = database.database_name.split(" ")[0]
-                engine = create_engine(f"sqlite:///dbs/{datasource.sdmx_uuid}", echo=False)
-
-                for dataset in message.payload.keys():
-                    df = message.payload[dataset].data
-                    table_name = str(dataset) + " " + str(datetime.datetime.now())
-                    df.to_sql(table_name, con=engine)
-                    datasource.table_name = table_name
-                
-                db.session.commit()
+                load_database(datasource.sdmx_url, datasource)
 
 
         try:

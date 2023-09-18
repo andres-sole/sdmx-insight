@@ -112,6 +112,7 @@ from superset.superset_typing import (
 )
 from superset.utils import core as utils
 from superset.utils.core import GenericDataType, MediumText
+import os
 
 config = app.config
 metadata = Model.metadata  # pylint: disable=no-member
@@ -537,6 +538,7 @@ class SqlaTable(
     is_sdmx = Column(Boolean, default=False)
     sdmx_url = Column(String(1024), nullable=True)
     sdmx_uuid = Column(String(256), nullable=True)
+    concepts = Column(Text, nullable=True)
     database: Database = relationship(
         "Database",
         backref=backref("tables", cascade="all, delete-orphan"),
@@ -1477,6 +1479,17 @@ class SqlaTable(
         security_manager.dataset_after_insert(mapper, connection, target)
 
     @staticmethod
+    def before_delete(
+        mapper: Mapper,
+        connection: Connection,
+        sqla_table: SqlaTable,
+    ) -> None:
+        if sqla_table.is_sdmx:
+            session = Session.object_session(sqla_table)
+            os.remove(f"dbs/{sqla_table.sdmx_uuid}")
+            session.delete(sqla_table.database)
+
+    @staticmethod
     def after_delete(
         mapper: Mapper,
         connection: Connection,
@@ -1498,6 +1511,7 @@ class SqlaTable(
 
 sa.event.listen(SqlaTable, "before_update", SqlaTable.before_update)
 sa.event.listen(SqlaTable, "after_insert", SqlaTable.after_insert)
+sa.event.listen(SqlaTable, "before_delete", SqlaTable.before_delete)
 sa.event.listen(SqlaTable, "after_delete", SqlaTable.after_delete)
 sa.event.listen(SqlMetric, "after_update", SqlaTable.update_column)
 sa.event.listen(TableColumn, "after_update", SqlaTable.update_column)
