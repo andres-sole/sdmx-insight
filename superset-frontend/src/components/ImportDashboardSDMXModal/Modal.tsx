@@ -5,10 +5,17 @@ import { Upload, Space, Select } from 'antd';
 import Modal from 'src/components/Modal';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
 import { FormLabel } from 'src/components/Form';
+import { RcFile } from 'antd/lib/upload';
 import Button from '../Button';
 
-const SdmxDashboardModal = ({ isOpen, onClose }) => {
-  const [sdmxFile, setSdmxFile] = useState([]);
+const SdmxDashboardModal = ({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
+  const [sdmxFile, setSdmxFile] = useState([] as RcFile[]);
   const [isLoading, setIsLoading] = useState(false);
   const [locale, setLocale] = useState('en');
   const { addDangerToast } = useToasts();
@@ -32,7 +39,6 @@ const SdmxDashboardModal = ({ isOpen, onClose }) => {
         window.location.pathname = `/superset/dashboard/${res.json.dashboard_id}`;
       })
       .catch(err => {
-        console.log(err);
         setIsLoading(false);
         addDangerToast('There was an error loading the SDMX file');
         setSdmxFile([]);
@@ -57,20 +63,27 @@ const SdmxDashboardModal = ({ isOpen, onClose }) => {
         </>
       }
     >
-      <p style={{ color: 'rgb(75, 75, 75)' }}>
+      <p style={{ color: 'var(--ifm-font-base-color)' }}>
         A sample YAML file can be downloaded{' '}
-        <a href="https://sdmx.org/wp-content/uploads/ExampleDashboardILOSTAT-SDMXHackathon-v1.1.yaml.7z">
+        <a
+          rel="noreferrer"
+          href="https://sdmx.org/wp-content/uploads/ExampleDashboardILOSTAT-SDMXHackathon-v1.1.yaml.7z"
+        >
           here
         </a>
         . This is a proof of concept of what a declaration of graphs through
         configuration files may look like.{' '}
-        <a href="https://www.sdmx2023.org/hackathon" target="_blank">
+        <a
+          rel="noreferrer"
+          href="https://www.sdmx2023.org/hackathon"
+          target="_blank"
+        >
           Learn more about this project
         </a>
       </p>
       <div>
         <Space direction="vertical">
-        <FormLabel>Load YAML Dashboard file</FormLabel>
+          <FormLabel>Load YAML Dashboard file</FormLabel>
           <Upload
             multiple={false}
             accept=".yaml"
@@ -82,7 +95,6 @@ const SdmxDashboardModal = ({ isOpen, onClose }) => {
           >
             <Button>Select file</Button>
           </Upload>
-
 
           <FormLabel>Select Locale</FormLabel>
           <Select
