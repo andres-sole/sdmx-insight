@@ -29,7 +29,7 @@ const SdmxDashboardModal = ({ isOpen, onClose }) => {
     })
       .then(res => {
         setIsLoading(false);
-        window.location.reload();
+        window.location.pathname = `/superset/dashboard/${res.json.dashboard_id}`;
       })
       .catch(err => {
         console.log(err);
