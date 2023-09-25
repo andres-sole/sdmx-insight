@@ -2061,11 +2061,12 @@ class SqlaTable(
         connection: Connection,
         sqla_table: SqlaTable,
     ) -> None:
-        if sqla_table.is_sdmx:
+        try:
             session = Session.object_session(sqla_table)
             os.remove(f"dbs/{sqla_table.sdmx_uuid}")
             session.delete(sqla_table.database)
-
+        except Exception as ex:  # pylint: disable=broad-except
+            pass
     @staticmethod
     def after_delete(
         mapper: Mapper,
