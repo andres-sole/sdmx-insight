@@ -23,10 +23,8 @@ x-superset-volumes:
   - ./docker:/app/docker
   - superset_home:/app/superset_home
   - ./dbs:/app/dbs
-  - ./superset:/app/superset
-  - ./superset-frontend:/app/superset-frontend
-
-
+  # - ./superset:/app/superset
+  # - ./superset-frontend:/app/superset-frontend
 
 x-common-build: &common-build
   context: .
