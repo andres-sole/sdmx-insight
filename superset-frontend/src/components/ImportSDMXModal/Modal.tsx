@@ -11,6 +11,8 @@ import { Input } from '../Input';
 import Button from '../Button';
 import './style.css';
 
+const { TabPane } = Tabs;
+
 const SdmxImportModal = ({
   isOpen,
   onClose,
@@ -18,8 +20,6 @@ const SdmxImportModal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const { TabPane } = Tabs;
-
   const { addDangerToast } = useToasts();
 
   const [sdmxUrl, setSdmxUrl] = useState('');
