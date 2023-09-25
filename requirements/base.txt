@@ -412,3 +412,9 @@ zipp==3.21.0
     # via importlib-metadata
 zstandard==0.23.0
     # via flask-compress
+    #   importlib-metadata
+    #   importlib-resources
+sdmxthon==2.3.1
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
