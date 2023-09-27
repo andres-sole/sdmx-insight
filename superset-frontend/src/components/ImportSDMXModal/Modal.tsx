@@ -33,7 +33,7 @@ const SdmxImportModal = ({
   const [selectedDataflow, setSelectedDataflow] = useState(
     null as null | string,
   );
-  const [numberOfObservations, setNumberOfObservations] = useState(5);
+  const [numberOfObservations, setNumberOfObservations] = useState(1);
 
   useEffect(() => {
     SupersetClient.get({
@@ -121,7 +121,7 @@ const SdmxImportModal = ({
 
     loadDataflows(agencyId);
     setSelectedDataflow(null);
-    setNumberOfObservations(5);
+    setNumberOfObservations(1);
   };
 
   return (
