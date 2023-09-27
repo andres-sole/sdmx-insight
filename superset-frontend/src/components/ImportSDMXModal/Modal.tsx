@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { SupersetClient } from '@superset-ui/core';
-import { Select, Space } from 'antd';
+import { Space } from 'antd';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
 import Modal from 'src/components/Modal';
+import Select from 'src/components/Select/Select';
 import Tabs from 'src/components/Tabs';
 import { isPlainObject } from 'lodash';
 import { FormLabel } from '../Form';
@@ -107,6 +108,11 @@ const SdmxImportModal = ({
     }
   };
 
+  const filterDataflow = (
+    input: string,
+    option?: { label: string; value: string },
+  ) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
   const handleAgencyChange = (agencyId: string) => {
     if (!dataflows[agencyId]) {
       setDataflows({ ...dataflows, [agencyId]: [] });
@@ -172,13 +178,19 @@ const SdmxImportModal = ({
           <Space direction="vertical" size={12} style={{ width: '100%' }}>
             <FormLabel>Select Agency</FormLabel>
             <Select
-              onChange={agencyId => handleAgencyChange(agencyId)}
-              style={{ width: '100%' }}
+              onChange={(agencyId: string) => handleAgencyChange(agencyId)}
+              showSearch={false}
               value={selectedAgency as string}
-              options={agencies.map((option, index) => ({
-                label: option,
-                value: option,
-              }))}
+              placeholder="Select an agency"
+              options={agencies
+                .filter(option => {
+                  if (option.endsWith('v2')) return false;
+                  return true;
+                })
+                .map(option => ({
+                  label: option,
+                  value: option,
+                }))}
               loading={isLoadingDataflows}
               disabled={isLoadingDataflows}
             />
@@ -189,7 +201,10 @@ const SdmxImportModal = ({
                   onChange={(dataflowId: string) =>
                     setSelectedDataflow(dataflowId)
                   }
-                  style={{ width: '100%' }}
+                  showSearch
+                  filterOption={filterDataflow}
+                  placeholder="Select a dataflow"
+                  notFoundContent="No dataflows found"
                   value={selectedDataflow as string}
                   disabled={isLoadingDataflows}
                   loading={isLoadingDataflows}
