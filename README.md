@@ -1,23 +1,10 @@
-<!--
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+# SDMX Insight
 
-  http://www.apache.org/licenses/LICENSE-2.0
+![SDMX Insight Logo](superset-frontend/src/assets/images/logo.png)
 
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
--->
+SDMX Insight is a fork of [Apache Superset](https://github.com/apache/superset). It's an open-source project initially created for the [SDMX 2023 Hackathon](https://www.sdmx2023.org/hackathon) with the objective of creating a dashboard generator.
 
-# Superset
+## Technologies
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/license/apache-2-0)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/apache/superset?sort=semver)](https://github.com/apache/superset/tree/latest)
@@ -42,7 +29,8 @@ under the License.
   />
 </picture>
 
-A modern, enterprise-ready business intelligence web application.
+### Development Mode
+To run the project in development mode on Linux systems, execute the following command:
 
 [**Why Superset?**](#why-superset) |
 [**Supported Databases**](#supported-databases) |
@@ -185,9 +173,7 @@ Understanding the Superset Points of View
   ](https://preset.io/blog/tutorial-contributing-code-to-apache-superset/)
 - [Resources to master Superset by Preset](https://preset.io/resources/)
 
-- Deploying Superset
-  - [Official Docker image](https://hub.docker.com/r/apache/superset)
-  - [Helm Chart](https://github.com/apache/superset/tree/master/helm/superset)
+For running the project in production mode on Linux systems, use:
 
 - Recordings of Past [Superset Community Events](https://preset.io/events)
   - [Mixed Time Series Charts](https://preset.io/events/mixed-time-series-visualization-in-superset-workshop/)
@@ -196,10 +182,7 @@ Understanding the Superset Points of View
   - [Introduction to the Superset API](https://preset.io/events/introduction-to-the-superset-api/)
   - [Building a Database Connector for Superset](https://preset.io/events/2021-02-16-building-a-database-connector-for-superset/)
 
-- Visualizations
-  - [Creating Viz Plugins](https://superset.apache.org/docs/contributing/creating-viz-plugins/)
-  - [Managing and Deploying Custom Viz Plugins](https://medium.com/nmc-techblog/apache-superset-manage-custom-viz-plugins-in-production-9fde1a708e55)
-  - [Why Apache Superset is Betting on Apache ECharts](https://preset.io/blog/2021-4-1-why-echarts/)
+Note: The project can also be launched on Windows by running the aforementioned compose files via Docker Desktop.
 
 - [Superset API](https://superset.apache.org/docs/rest-api)
 
