@@ -15,11 +15,18 @@ SDMX Insight is primarily built using, among others:
 
 ## Deployment
 
+By cloning this repository, SDMX Insight can be deployed on any system that supports the Docker  environment.
+
 ### Development Mode
 To run the project in development mode on Linux systems, execute the following command:
 
 ```bash
 docker-compose up
+```
+On Windows:
+
+```powershell
+docker compose up
 ```
 
 
@@ -31,5 +38,12 @@ For running the project in production mode on Linux systems, use:
 docker-compose -f docker-compose-non-dev.yml up -d
 ```
 
-Note: The project can also be launched on Windows by running the aforementioned compose files via Docker Desktop.
+On Windows:
 
+```powershell
+docker compose -f docker-compose-non-dev.yml up -d
+```
+
+After deployment, SDMX Insight will be accessible at localhost:8088. For custom domain access, set up a reverse proxy using a web server like NGINX or Apache HTTP Server.
+
+The port to which SDMX Insight is deployed can be altered by adjusting the port mapping in docker-compose-non-dev.yml.
