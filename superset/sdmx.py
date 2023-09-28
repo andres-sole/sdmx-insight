@@ -7,8 +7,6 @@ from sdmxthon.api.api import get_supported_agencies
 from sdmxthon import read_sdmx
 from superset.connectors.sqla.models import SqlaTable
 from superset.extensions import security_manager
-from superset.models.core import Database
-from superset.models.dashboard import Dashboard
 from superset.models.slice import Slice
 from superset.dashboards.commands.create import CreateDashboardCommand
 from superset.databases.commands.create import CreateDatabaseCommand
@@ -18,20 +16,24 @@ import re
 import sqlite3
 
 
-def load_database(sdmx_url, dataset_instance=None):
+def load_database(sdmx_url, dataset_instance=None, is_raw_url=False):
     # Extract main data and identifiers
     message = read_sdmx(sdmx_url)
     agency_id, dataflow_id = get_identifiers(sdmx_url)
     data = extract_data_from_message(message)
 
-    # Get the required web service
-    ws = get_webservice_for_agency(agency_id)
+    concepts_name = {}
+    if not is_raw_url:
+        # Get the required web service
+        ws = get_webservice_for_agency(agency_id)
 
-    # Fetch metadata
-    metadata = fetch_metadata(ws, dataflow_id)
+        # Fetch metadata
+        metadata = fetch_metadata(ws, dataflow_id)
 
-    # Generate the final dataframe and concepts names
-    df, concepts_name = generate_final_df_and_concepts_name(data, metadata.payload)
+        # Generate the final dataframe and concepts names
+        df, concepts_name = generate_final_df_and_concepts_name(data, metadata.payload)
+    else:
+        df = data
 
     # Process the database
     dataset_uuid, database = process_database(dataset_instance, df, message, sdmx_url)
@@ -93,7 +95,7 @@ def process_database(dataset_instance, df, message, sdmx_url):
 
 
 def update_permissions_and_metadata(
-    database, dataset_instance, dataset_uuid, sdmx_url, concepts_name
+    database, dataset_instance, dataset_uuid, sdmx_url, concepts_name={}
 ):
     """Update table permissions and metadata."""
     schemas = database.get_all_schema_names(cache=False)
