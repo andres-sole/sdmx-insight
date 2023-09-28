@@ -98,23 +98,19 @@ class Api(BaseSupersetView):
     def sdmx_upload(self) -> FlaskResponse:
         try:
             json_data = request.json
-
+            is_raw_url = False
             if "sdmxUrl" in json_data:
                 sdmx_url = json_data["sdmxUrl"]
+                is_raw_url = True
             elif "agencyId" in json_data:
                 agency_id = json_data["agencyId"]
                 supported_agencies = get_supported_agencies()
-                if json_data["agencyId"] not in supported_agencies.keys():
-                    return self.json_response(
-                        {
-                            "error": f"Agency {agency_id} not supported. Supported agencies: {list(supported_agencies.keys())}"
-                        },
-                        status=400,
-                    )
-                dataflow_id = json_data["dataflowId"].split(":")[1].split("(")[0]
-                sdmx_url = supported_agencies[agency_id]().get_data_url(dataflow_id, last_n_observations=json_data["numberOfObservations"])
-
-            load_database(sdmx_url)
+                if json_data["agencyId"] in supported_agencies.keys():
+                    dataflow_id = json_data["dataflowId"].split(":")[1].split("(")[0]
+                    sdmx_url = supported_agencies[agency_id]().get_data_url(dataflow_id, last_n_observations=json_data["numberOfObservations"])
+                else:
+                    sdmx_url = json_data["sdmxUrl"]
+            load_database(sdmx_url, is_raw_url=is_raw_url)
             return self.json_response({"status": "OK"})
         except Exception as e:
             return self.json_response(
