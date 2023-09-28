@@ -29,6 +29,8 @@ SDMX Insight is a fork of [Apache Superset](https://github.com/apache/superset).
   />
 </picture>
 
+By cloning this repository, SDMX Insight can be deployed on any system that supports the Docker  environment.
+
 ### Development Mode
 To run the project in development mode on Linux systems, execute the following command:
 
@@ -182,7 +184,7 @@ For running the project in production mode on Linux systems, use:
   - [Introduction to the Superset API](https://preset.io/events/introduction-to-the-superset-api/)
   - [Building a Database Connector for Superset](https://preset.io/events/2021-02-16-building-a-database-connector-for-superset/)
 
-Note: The project can also be launched on Windows by running the aforementioned compose files via Docker Desktop.
+On Windows:
 
 - [Superset API](https://superset.apache.org/docs/rest-api)
 
