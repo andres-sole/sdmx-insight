@@ -68,8 +68,6 @@ services:
     image: postgres:15
     container_name: superset_db
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:5432:5432"
     volumes:
       - db_home:/var/lib/postgresql/data
       - ./docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
@@ -171,6 +169,8 @@ services:
         required: false
     depends_on: *superset-depends-on
     volumes: *superset-volumes
+    mem_limit: 5008m
+    mem_reservation: 128M
 
   superset-worker:
     build:
@@ -193,8 +193,8 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "celery -A superset.tasks.celery_app:app inspect ping -d celery@$$HOSTNAME"]
     # Bump memory limit if processing selenium / thumbnails on superset-worker
-    # mem_limit: 2038m
-    # mem_reservation: 128M
+    mem_limit: 2038m
+    mem_reservation: 128M
 
   superset-worker-beat:
     build:
