@@ -123,6 +123,5 @@ docker/*local*
 test-report.html
 superset/static/stats/statistics.html
 
-
 # SDMX Insight
 dbs/

@@ -14,13 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-# -----------------------------------------------------------------------
-# We don't support docker compose for production environments.
-# If you choose to use this type of deployment make sure to
-# create you own docker environment file (docker/.env) with your own
-# unique random secure passwords and SECRET_KEY.
-# -----------------------------------------------------------------------
+x-superset-image: &superset-image andressole/sdmx-insight:latest
 x-superset-user: &superset-user root
 x-superset-depends-on: &superset-depends-on
   - db
@@ -32,6 +26,7 @@ x-superset-volumes: &superset-volumes
   - ./superset-frontend:/app/superset-frontend
   - superset_home:/app/superset_home
   - ./tests:/app/tests
+  - ./dbs:/app/dbs
 
 x-common-build: &common-build
   context: .

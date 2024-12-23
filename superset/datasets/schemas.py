@@ -102,6 +102,8 @@ class DatasetPostSchema(Schema):
     is_sdmx = fields.Boolean(allow_none=True)
     sdmx_url = fields.String(allow_none=True)
 
+    is_sdmx = fields.Boolean(allow_none=True)
+    sdmx_url = fields.String(allow_none=True)
 
 class DatasetPutSchema(Schema):
     table_name = fields.String(allow_none=True, validate=Length(1, 250))

@@ -31,10 +31,10 @@ from superset.commands.chart.exceptions import (
 )
 from superset.legacy import update_time_range
 from superset.models.slice import Slice
+from superset.models.core import Database
 from superset.superset_typing import FlaskResponse
 from superset.utils import json
 from superset.utils.date_parser import get_since_until
-from superset.views.base import api, BaseSupersetView
 from superset.views.error_handling import handle_api_exception
 from superset.sdmx import load_database, create_dashboard, create_charts
 import yaml
