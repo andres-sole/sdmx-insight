@@ -65,6 +65,7 @@ import DuplicateDatasetModal from 'src/features/datasets/DuplicateDatasetModal';
 import { useSelector } from 'react-redux';
 import { ModifiedInfo } from 'src/components/AuditInfo';
 import { QueryObjectColumns } from 'src/views/CRUD/types';
+import ImportSDMXModal from 'src/components/ImportSDMXModal/Modal';
 
 const extensionsRegistry = getExtensionsRegistry();
 const DatasetDeleteRelatedExtension = extensionsRegistry.get(
@@ -628,6 +629,20 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
   };
 
   const buttonArr: Array<ButtonProps> = [];
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleImportFileModal = () => {
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+  buttonArr.push({
+    name: 'Import SDMX dataset',
+    onClick: toggleImportFileModal,
+    buttonStyle: 'tertiary',
+  });
+
 
   if (canDelete || canExport) {
     buttonArr.push({
@@ -741,6 +756,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
   return (
     <>
       <SubMenu {...menuData} />
+      <ImportSDMXModal isOpen={isModalOpen} onClose={closeModal} />
       {datasetCurrentlyDeleting && (
         <DeleteModal
           description={

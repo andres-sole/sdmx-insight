@@ -412,3 +412,6 @@ zipp==3.21.0
     # via importlib-metadata
 zstandard==0.23.0
     # via flask-compress
+
+# SDMX Insight
+sdmxthon==2.3.2

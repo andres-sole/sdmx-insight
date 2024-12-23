@@ -1932,3 +1932,25 @@ elif importlib.util.find_spec("superset_config") and not is_test():
     except Exception:
         logger.exception("Found but failed to import local superset_config")
         raise
+
+
+HTML_SANITIZATION = False
+CONTENT_SECURITY_POLICY_WARNING = False
+
+APP_ICON="/static/assets/images/logo.png"
+APP_NAME="SDMX Insight"
+
+THEME_OVERRIDES = {
+  "borderRadius": 4,
+  "colors": {
+    "primary": {
+      "primary": '#3c86ae',
+    },
+    "secondary": {
+      "base": '#3c86ae',
+    },
+    "grayscale": {
+      "base": '#525252',
+    }
+  }
+}

@@ -25,7 +25,7 @@ from flask_appbuilder.api import expose, protect
 from flask_babel import gettext as _
 from marshmallow import ValidationError
 
-from superset import is_feature_enabled, security_manager
+from superset import is_feature_enabled, security_manager, db
 from superset.async_events.async_query_manager import AsyncQueryTokenException
 from superset.charts.api import ChartRestApi
 from superset.charts.client_processing import apply_client_processing
@@ -40,10 +40,11 @@ from superset.commands.chart.exceptions import (
     ChartDataQueryFailedError,
 )
 from superset.common.chart_data import ChartDataResultFormat, ChartDataResultType
-from superset.connectors.sqla.models import BaseDatasource
+from superset.connectors.sqla.models import BaseDatasource, SqlaTable
 from superset.daos.exceptions import DatasourceNotFound
 from superset.exceptions import QueryObjectValidationError
 from superset.extensions import event_logger
+from superset.models.slice import Slice
 from superset.models.sql_lab import Query
 from superset.utils import json
 from superset.utils.core import (
@@ -54,6 +55,7 @@ from superset.utils.core import (
 from superset.utils.decorators import logs_context
 from superset.views.base import CsvResponse, generate_download_headers, XlsxResponse
 from superset.views.base_api import statsd_metrics
+from superset.sdmx import load_database
 
 if TYPE_CHECKING:
     from superset.common.query_context import QueryContext
@@ -232,6 +234,13 @@ class ChartDataRestApi(ChartRestApi):
                 json_body = json.loads(request.form["form_data"])
         if json_body is None:
             return self.response_400(message=_("Request is not JSON"))
+        if "slice_id" in json_body['form_data']:
+            slice = db.session.query(Slice).filter_by(id=json_body['form_data']['slice_id']).first()
+            datasource_id = slice.datasource_id
+            datasource = db.session.query(SqlaTable).filter_by(id=datasource_id).first()
+            if datasource and datasource.is_sdmx and json_body['form_data']['force']:
+                load_database(datasource.sdmx_url, datasource)
+
 
         try:
             query_context = self._create_query_context_from_form(json_body)

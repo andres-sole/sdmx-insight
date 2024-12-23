@@ -1190,6 +1190,9 @@ class SqlaTable(
     extra = Column(Text)
     normalize_columns = Column(Boolean, default=False)
     always_filter_main_dttm = Column(Boolean, default=False)
+    is_sdmx = Column(Boolean, default=False)
+    sdmx_url = Column(String(1024), nullable=True)
+    sdmx_uuid = Column(String(256), nullable=True)
 
     baselink = "tablemodelview"
 

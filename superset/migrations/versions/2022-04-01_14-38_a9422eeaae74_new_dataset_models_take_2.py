@@ -40,6 +40,7 @@ from sqlalchemy.schema import UniqueConstraint  # noqa: E402
 from sqlalchemy.sql import functions as func  # noqa: E402
 from sqlalchemy.sql.expression import and_, or_  # noqa: E402
 from sqlalchemy_utils import UUIDType  # noqa: E402
+from time import sleep  # noqa: E402
 
 from superset.connectors.sqla.models import ADDITIVE_METRIC_TYPES_LOWER  # noqa: E402
 from superset.connectors.sqla.utils import (  # noqa: E402
@@ -879,34 +880,63 @@ def reset_postgres_id_sequence(table: str) -> None:
     )
 
 
-def upgrade() -> None:
+def upgrade():
     bind = op.get_bind()
     session: Session = Session(bind=bind)
-    Base.metadata.drop_all(bind=bind, tables=new_tables)
-    Base.metadata.create_all(bind=bind, tables=new_tables)
 
+    # Drop tables first
+    print("Dropping tables...")
+    Base.metadata.drop_all(bind=bind, tables=new_tables)
+    sleep(5)  # Add delay
+
+    # Create tables
+    print("Creating tables...")
+    Base.metadata.create_all(bind=bind, tables=new_tables)
+    sleep(5)  # Add delay
+
+    # Copy operations
+    print("Copying tables...")
     copy_tables(session)
+    session.commit()
+    sleep(5)  # Add delay
+
+    print("Copying datasets...")
     copy_datasets(session)
+    session.commit()
+    sleep(5)  # Add delay
+
+    print("Copying columns...")
     copy_columns(session)
+    session.commit()
+    sleep(5)  # Add delay
+
+    print("Copying metrics...")
     copy_metrics(session)
     session.commit()
+    sleep(5)  # Add delay
 
+    # Post-processing operations
+    print("Post-processing columns...")
     postprocess_columns(session)
     session.commit()
+    sleep(5)  # Add delay
 
+    print("Post-processing datasets...")
     postprocess_datasets(session)
     session.commit()
+    sleep(5)  # Add delay
 
-    # Table were created with the same uuids are datasets. They should
-    # have different uuids as they are different entities.
-    print(">> Assign new UUIDs to tables...")
+    # Final operations
+    print("Assigning new UUIDs...")
     assign_uuids(NewTable, session)
+    session.commit()
+    sleep(5)  # Add delay
 
-    print(">> Drop intermediate columns...")
-    # These columns are are used during migration, as datasets are independent of tables once created,  # noqa: E501
-    # dataset columns also the same to table columns.
+    print("Dropping intermediate columns...")
     with op.batch_alter_table(NewTable.__tablename__) as batch_op:
         batch_op.drop_column("sqlatable_id")
+    sleep(5)  # Add delay
+
     with op.batch_alter_table(NewColumn.__tablename__) as batch_op:
         batch_op.drop_column("table_id")
 

@@ -36,6 +36,10 @@ from superset.utils import json
 from superset.utils.date_parser import get_since_until
 from superset.views.base import api, BaseSupersetView
 from superset.views.error_handling import handle_api_exception
+from superset.sdmx import load_database, create_dashboard, create_charts
+import yaml
+from sdmxthon.api.api import get_supported_agencies
+from sdmxthon.webservices import webservices
 
 if TYPE_CHECKING:
     from superset.common.query_context_factory import QueryContextFactory
@@ -54,6 +58,95 @@ get_time_range_schema = {
 
 class Api(BaseSupersetView):
     query_context_factory = None
+
+    # @has_access_api
+    @event_logger.log_this
+    @api
+    @handle_api_exception
+    @expose("/v1/sdmx/dashboard", methods=("POST",))
+    def sdmx_upload_dashboard(self) -> FlaskResponse:
+        try:
+            uploaded_file = request.files["file"]
+            file_content = uploaded_file.read()
+            spec = yaml.safe_load(file_content)
+            locale = request.form.get("locale", "en")
+            datasets = []
+
+            for row in spec["Rows"]:
+                if not row["DATA"]:
+                    datasets.append(None)
+                    continue
+                sdmx_url = row["DATA"].split(" ")[0]
+                datasets.append(load_database(sdmx_url))
+
+            dashboard = create_dashboard(spec)
+
+            create_charts(spec, datasets, dashboard, locale)
+
+            return self.json_response({"status": "OK", "dashboard_id": dashboard.id})
+        except Exception as e:
+            return self.json_response(
+                json.dumps({"error": str(e)}),
+                status=500,
+            )
+
+    # @has_access_api
+    @event_logger.log_this
+    @api
+    @handle_api_exception
+    @expose("/v1/sdmx/", methods=("POST",))
+    def sdmx_upload(self) -> FlaskResponse:
+        try:
+            json_data = request.json
+            is_raw_url = False
+            if "sdmxUrl" in json_data:
+                sdmx_url = json_data["sdmxUrl"]
+                is_raw_url = True
+            elif "agencyId" in json_data:
+                agency_id = json_data["agencyId"]
+                supported_agencies = get_supported_agencies()
+                if json_data["agencyId"] in supported_agencies.keys():
+                    dataflow_id = json_data["dataflowId"].split(":")[1].split("(")[0]
+                    sdmx_url = supported_agencies[agency_id]().get_data_url(dataflow_id, last_n_observations=json_data["numberOfObservations"])
+                else:
+                    sdmx_url = json_data["sdmxUrl"]
+            load_database(sdmx_url, is_raw_url=is_raw_url)
+            return self.json_response({"status": "OK"})
+        except Exception as e:
+            return self.json_response(
+                json.dumps({"error": str(e)}),
+                status=500,
+            )
+
+    @event_logger.log_this
+    @api
+    @handle_api_exception
+    @expose("/v1/sdmx/agency", methods=("GET",))
+    def sdmx_get_agencies(self) -> FlaskResponse:
+        try:
+            agencies = list(get_supported_agencies().keys())
+            return self.json_response(agencies)
+        except Exception as e:
+            return self.json_response(
+                json.dumps({"error": str(e)}),
+                status=500,
+            )
+
+    @event_logger.log_this
+    @api
+    @handle_api_exception
+    @expose("/v1/sdmx/agency/<agency_id>", methods=("GET",))
+    def sdmx_get_dataflows(self, agency_id) -> FlaskResponse:
+        try:
+            return self.json_response(
+                get_supported_agencies()[agency_id]().get_all_dataflows()
+            )
+
+        except Exception as e:
+            return self.json_response(
+                json.dumps({"error": str(e)}),
+                status=500,
+            )
 
     @event_logger.log_this
     @api

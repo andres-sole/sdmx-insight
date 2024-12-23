@@ -883,3 +883,6 @@ zstandard==0.23.0
     # via
     #   -c requirements/base.txt
     #   flask-compress
+
+# SDMX Insight
+sdmxthon==2.3.2
